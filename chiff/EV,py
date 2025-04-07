@@ -1,0 +1,75 @@
+# 📦 CHIFR 1차 시험 Python 통합 실행본
+# 실행하면서 복습하는 버전!
+
+# 1. Modular exponentiation (square and multiply)
+def mod_exp(base, exp, mod):
+    result = 1
+    base %= mod
+    while exp > 0:
+        if exp % 2:
+            result = (result * base) % mod
+        base = (base * base) % mod
+        exp //= 2
+    return result
+
+print("[Modular Exponentiation]")
+print("9^127 mod 23:", mod_exp(9, 127, 23))  # 정답: 3
+print("243^320 mod 29:", mod_exp(243, 320, 29))  # 정답: 7
+print()
+
+
+# 2. Modular inverse (Extended Euclidean Algorithm)
+def mod_inv(a, m):
+    m0, x0, x1 = m, 0, 1
+    while a > 1:
+        q = a // m
+        a, m = m, a % m
+        x0, x1 = x1 - q * x0, x0
+    return x1 + m0 if x1 < 0 else x1
+
+print("[Modular Inverse]")
+print("Inverse of 23 mod 156:", mod_inv(23, 156))  # 정답: 95
+print()
+
+
+# 3. RSA: Key generation, encryption, decryption
+print("[RSA Encryption & Decryption]")
+p, q, e = 7, 13, 7
+n = p * q
+phi = (p - 1) * (q - 1)
+d = mod_inv(e, phi)
+m = 8
+c = mod_exp(m, e, n)
+m_decrypted = mod_exp(c, d, n)
+print(f"p={p}, q={q}, e={e}, n={n}, phi={phi}, d={d}")
+print("Encrypted c:", c)  # 정답: 2
+print("Decrypted m:", m_decrypted)  # 정답: 8
+print()
+
+
+# 4. ElGamal encryption
+print("[ElGamal Encryption]")
+p, g, pk, m, a = 23, 5, 17, 13, 3
+c1 = mod_exp(g, a, p)
+c2 = (m * mod_exp(pk, a, p)) % p
+print("c1:", c1)  # 정답: 10
+print("c2:", c2)  # 정답: 8
+print("Ciphertext (c1, c2):", (c1, c2))
+print()
+
+
+# 5. One-Time Pad (Vernam cipher)
+def vernam_encrypt(message, key):
+    return ''.join(chr(ord(m) ^ ord(k)) for m, k in zip(message, key))
+
+def vernam_decrypt(cipher, key):
+    return vernam_encrypt(cipher, key)  # XOR는 대칭
+
+print("[One-Time Pad (Vernam cipher)]")
+message = "HELLO"
+key = "pizza"
+cipher = vernam_encrypt(message, key)
+decrypted = vernam_decrypt(cipher, key)
+print("Encrypted:", cipher)
+print("Decrypted:", decrypted)  # 정답: HELLO
+print()
